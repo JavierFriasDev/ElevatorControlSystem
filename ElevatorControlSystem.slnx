@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ElevatorControlSystem.Tests/ElevatorControlSystem.Tests.csproj" />
+  <Project Path="ElevatorControlSystem/ElevatorControlSystem.csproj" />
+</Solution>
