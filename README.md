@@ -1,6 +1,6 @@
 # ElevatorControlSystem
 
-A production-like elevator control system simulation built with C# and .NET 8.0, demonstrating clean architecture, SOLID principles, and asynchronous programming patterns.
+A production-like elevator control system simulation built with C# and .NET 10.0, demonstrating clean architecture, SOLID principles, and asynchronous programming patterns.
 
 ## Overview
 
@@ -15,3 +15,14 @@ This project implements an elementary elevator control system that manages 4 ele
 - **Event-Driven Architecture** for real-time notifications
 - **Comprehensive Unit Tests** with xUnit
 - **Clean Code** following SOLID principles
+
+### Running Tests
+
+```bash
+dotnet test
+```
+
+Expected output:
+```
+Test summary: total: 7, failed: 0, succeeded: 7, skipped: 0
+```
