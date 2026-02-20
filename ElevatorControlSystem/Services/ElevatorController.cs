@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ElevatorControlSystem.Models;
+using ElevatorControlSystem.Constants;
 
 namespace ElevatorControlSystem.Services;
 
@@ -76,14 +77,54 @@ public class ElevatorController
     /// </summary>
     public void DisplayStatus()
     {
-        Console.WriteLine("\n" + new string('=', 60));
-        Console.WriteLine("ELEVATOR STATUS");
-        Console.WriteLine(new string('=', 60));
-        foreach (var elevator in _elevators)
+        var status = GetStatusString();
+        Console.WriteLine(status);
+    }
+
+    /// <summary>
+    /// Builds a visual, testable representation of all elevators and floors.
+    /// Returns a multi-line string that can be asserted in tests.
+    /// </summary>
+    public string GetStatusString()
+    {
+        var sb = new StringBuilder();
+        int floors = BuildingConstants.TotalFloors;
+
+        sb.AppendLine();
+        sb.AppendLine(new string('=', 60));
+        sb.AppendLine("ELEVATOR STATUS");
+        sb.AppendLine(new string('=', 60));
+
+        // Header with elevator IDs
+        sb.Append("Floor ".PadRight(8));
+        foreach (var e in _elevators)
         {
-            Console.WriteLine(elevator);
+            sb.Append($"E{e.Id}".PadRight(8));
         }
-        Console.WriteLine(new string('=', 60) + "\n");
+        sb.AppendLine();
+
+        // Draw shafts from top floor to bottom
+        for (int f = floors; f >= 1; f--)
+        {
+            sb.Append(f.ToString().PadLeft(3) + " ".PadRight(5));
+            foreach (var e in _elevators)
+            {
+                if (e.CurrentFloor == f)
+                    sb.Append($"[E{e.Id}:{e.CurrentDirection.ToString()[0]}]".PadRight(8));
+                else
+                    sb.Append("[     ]".PadRight(8));
+            }
+            sb.AppendLine();
+        }
+
+        sb.AppendLine(new string('-', 60));
+        foreach (var e in _elevators)
+        {
+            sb.AppendLine(e.ToString());
+        }
+        sb.AppendLine(new string('=', 60));
+
+        return sb.ToString();
     }
 
     private void HandleFloorChanged(int elevatorId, int floor, Enums.Direction direction)

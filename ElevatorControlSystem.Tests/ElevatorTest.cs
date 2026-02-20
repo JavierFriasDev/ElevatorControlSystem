@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ElevatorControlSystem.Constants;
+﻿using ElevatorControlSystem.Constants;
 using ElevatorControlSystem.Enums;
 using ElevatorControlSystem.Models;
 using Xunit;
@@ -10,6 +7,21 @@ namespace ElevatorControlSystem.Tests;
 
 public class ElevatorTests
 {
+    // Store original values to restore after tests
+    private readonly int _originalFloorTravelTime;
+    private readonly int _originalLoadingTime;
+
+    public ElevatorTests()
+    {
+        // Save original constants
+        _originalFloorTravelTime = BuildingConstants.FloorTravelTimeSeconds;
+        _originalLoadingTime = BuildingConstants.LoadingTimeSeconds;
+
+        // Set to 0 for fast test execution
+        BuildingConstants.FloorTravelTimeSeconds = 0;
+        BuildingConstants.LoadingTimeSeconds = 0;
+    }
+
     [Fact]
     public void Elevator_InitializesWithCorrectDefaults()
     {
@@ -60,7 +72,13 @@ public class ElevatorTests
 
         // Act
         elevator.AddDestination(3, Direction.Up);
-        await Task.Delay(32000);
+
+        // Wait until elevator reaches destination (with 2 second timeout)
+        var timeout = DateTime.Now.AddSeconds(2);
+        while (elevator.CurrentFloor != 3 && DateTime.Now < timeout)
+        {
+            await Task.Delay(50); // Check every 50ms
+        }
 
         // Assert
         Assert.Equal(3, elevator.CurrentFloor);
@@ -87,7 +105,13 @@ public class ElevatorTests
 
         // Act
         elevator.AddDestination(3, Direction.Down);
-        await Task.Delay(32000);
+
+        // Wait until elevator reaches destination (with 2 second timeout)
+        var timeout = DateTime.Now.AddSeconds(2);
+        while (elevator.CurrentFloor != 3 && DateTime.Now < timeout)
+        {
+            await Task.Delay(50); // Check every 50ms
+        }
 
         // Assert
         Assert.Equal(3, elevator.CurrentFloor);
@@ -100,7 +124,21 @@ public class ElevatorTests
         }
         catch (TaskCanceledException)
         {
-           // Expected when cancelling
+            // Expected when cancelling
         }
+    }
+
+    [Fact]
+    public void ToString_ReturnsCorrectFormat()
+    {
+        // Arrange
+        var elevator = new Elevator(2, startingFloor: 7);
+
+        // Act
+        var result = elevator.ToString();
+
+        // Assert
+        Assert.Contains("Elevator 2", result);
+        Assert.Contains("Floor 7", result);
     }
 }
