@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ElevatorControlSystem.Models;
 using ElevatorControlSystem.Constants;
+using ElevatorControlSystem.Enums;
 
 namespace ElevatorControlSystem.Services;
 
@@ -15,8 +16,10 @@ public class ElevatorController
     private readonly IElevatorDispatcher _dispatcher;
     private readonly List<Task> _elevatorTasks = new();
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly List<ElevatorRequest> _activeRequests = new();
 
     public IReadOnlyList<Elevator> Elevators => _elevators.AsReadOnly();
+    public IReadOnlyList<ElevatorRequest> ActiveRequests => _activeRequests.AsReadOnly();
 
     public ElevatorController(List<Elevator> elevators, IElevatorDispatcher dispatcher)
     {
@@ -49,6 +52,12 @@ public class ElevatorController
     public void RequestElevator(ElevatorRequest request)
     {
         Console.WriteLine($"\n[REQUEST] {request.Direction} button pressed on floor {request.Floor}");
+
+        // Track active request for UI
+        lock (_activeRequests)
+        {
+            _activeRequests.Add(request);
+        }
 
         var selectedElevator = _dispatcher.SelectElevator(_elevators, request);
 
@@ -135,5 +144,18 @@ public class ElevatorController
     private void HandleStateChanged(int elevatorId, Enums.ElevatorState state)
     {
         Console.WriteLine($"[STATE] Elevator {elevatorId} state changed to {state}");
+
+        // When elevator starts loading, remove matching active requests for that floor
+        if (state == ElevatorState.Loading)
+        {
+            var elevator = _elevators.FirstOrDefault(e => e.Id == elevatorId);
+            if (elevator != null)
+            {
+                lock (_activeRequests)
+                {
+                    _activeRequests.RemoveAll(r => r.Floor == elevator.CurrentFloor);
+                }
+            }
+        }
     }
 }

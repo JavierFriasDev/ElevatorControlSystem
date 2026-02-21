@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="ElevatorControlSystem.Tests/ElevatorControlSystem.Tests.csproj" />
+  <Project Path="ElevatorControlSystem.UI/ElevatorControlSystem.UI.csproj" Id="3c65b3c6-0ee8-4935-bac8-a5156d2226b4" />
   <Project Path="ElevatorControlSystem/ElevatorControlSystem.csproj" />
 </Solution>
