@@ -24,5 +24,5 @@ dotnet test
 
 Expected output:
 ```
-Test summary: total: 7, failed: 0, succeeded: 7, skipped: 0
+Test summary: total: 9, failed: 0, succeeded: 7, skipped: 0
 ```
